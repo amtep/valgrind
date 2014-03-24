@@ -3189,9 +3189,9 @@ struct vki_msmfb_mixer_info_req_5 {
         struct vki_mdp_mixer_info info[5]; // [MAX_PIPE_PER_MIXER]
 };
 
-#define VKI_MSMFB_MIXER_INFO_4	_IOWR('m', 148, \
+#define VKI_MSMFB_MIXER_INFO_4	_VKI_IOWR('m', 148, \
 		struct vki_msmfb_mixer_info_req_4)
-#define VKI_MSMFB_MIXER_INFO_5	_IOWR('m', 148, \
+#define VKI_MSMFB_MIXER_INFO_5	_VKI_IOWR('m', 148, \
 		struct vki_msmfb_mixer_info_req_5)
 
 #endif // __VKI_LINUX_H

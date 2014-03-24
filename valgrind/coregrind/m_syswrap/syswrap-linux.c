@@ -6922,6 +6922,17 @@ PRE(sys_ioctl)
    case VKI_EVIOCGRAB: /* parameter is value not address */
       break;
 
+   case VKI_MSMFB_MIXER_INFO_4:
+   case VKI_MSMFB_MIXER_INFO_5: {
+      struct vki_msmfb_mixer_info_req_5 *req =
+         (struct vki_msmfb_mixer_info_req_5 *)(ARG3);
+      PRE_FIELD_READ("ioctl(MSMFB_MIXER_INFO).mixer_num", req->mixer_num);
+      PRE_FIELD_WRITE("ioctl(MSMFB_MIXER_INFO).cnt", req->cnt);
+      PRE_MEM_WRITE("ioctl(MSMFB_MIXER_INFO).info", (Addr)(&req->info),
+         sizeof(req->info[0]) * (ARG2 == VKI_MSMFB_MIXER_INFO_4 ? 4 : 5));
+      break;
+   }
+
    default:
       /* EVIOC* are variable length and return size written on success */
       switch (ARG2 & ~(_VKI_IOC_SIZEMASK << _VKI_IOC_SIZESHIFT)) {
@@ -7977,6 +7988,21 @@ POST(sys_ioctl)
       }
       break;
 #endif
+
+   case VKI_MSMFB_MIXER_INFO_4:
+   case VKI_MSMFB_MIXER_INFO_5: {
+      struct vki_msmfb_mixer_info_req_5 *req =
+         (struct vki_msmfb_mixer_info_req_5 *)(ARG3);
+      POST_FIELD_WRITE(req->cnt);
+      if (req->cnt < 0 || req->cnt > (ARG2 == VKI_MSMFB_MIXER_INFO_4 ? 4 : 5)) {
+         VG_(message)(Vg_UserMsg,
+            "Warning: invalid return cnt %d from ioctl(MSMFB_MIXER_INFO)\n",
+            req->cnt);
+      } else {
+         POST_MEM_WRITE((Addr) &req->info, sizeof(req->info[0]) * req->cnt);
+      }
+      break;
+   }
 
    default:
       /* EVIOC* are variable length and return size written on success */
