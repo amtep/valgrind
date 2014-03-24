@@ -2854,6 +2854,12 @@ struct vki_getcpu_cache {
 #define VKI_EV_CNT		(VKI_EV_MAX+1)
 
 //----------------------------------------------------------------------
+// From linux-3.13/include/uapi/linux/input.h
+//----------------------------------------------------------------------
+
+#define VKI_EVIOCGRAB		_VKI_IOW('E', 0x90, int)			/* Grab/Release device */
+
+//----------------------------------------------------------------------
 // From linux-2.6.39-rc2/include/asm_generic/ioctls.h
 //----------------------------------------------------------------------
 
@@ -3155,6 +3161,39 @@ struct vki_sock_fprog {
 	struct vki_sock_filter *filter;
 };
    
+//----------------------------------------------------------------------
+// From include/linux/msm_mdp.h in Android msm kernels
+// https://git.gitorious.org/freedreno/kernel-msm.git
+//----------------------------------------------------------------------
+
+struct vki_mdp_mixer_info {
+        int pndx;
+        int pnum;
+        int ptype;
+        int mixer_num;
+        int z_order;
+};
+
+// MAX_PIPE_PER_MIXER is 4 in older kernels, 5 in later ones.
+// Support both versions of the ioctl.
+
+struct vki_msmfb_mixer_info_req_4 {
+        int mixer_num;
+        int cnt;
+        struct vki_mdp_mixer_info info[4]; // [MAX_PIPE_PER_MIXER]
+};
+
+struct vki_msmfb_mixer_info_req_5 {
+        int mixer_num;
+        int cnt;
+        struct vki_mdp_mixer_info info[5]; // [MAX_PIPE_PER_MIXER]
+};
+
+#define VKI_MSMFB_MIXER_INFO_4	_IOWR('m', 148, \
+		struct vki_msmfb_mixer_info_req_4)
+#define VKI_MSMFB_MIXER_INFO_5	_IOWR('m', 148, \
+		struct vki_msmfb_mixer_info_req_5)
+
 #endif // __VKI_LINUX_H
 
 /*--------------------------------------------------------------------*/

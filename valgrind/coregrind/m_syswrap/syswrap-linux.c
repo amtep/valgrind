@@ -6919,6 +6919,9 @@ PRE(sys_ioctl)
    }
 #endif
 
+   case VKI_EVIOCGRAB: /* parameter is value not address */
+      break;
+
    default:
       /* EVIOC* are variable length and return size written on success */
       switch (ARG2 & ~(_VKI_IOC_SIZEMASK << _VKI_IOC_SIZESHIFT)) {
