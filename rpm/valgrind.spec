@@ -57,12 +57,12 @@ Requires: valgrind = %{version}-%{release}
 RPM_OPT_FLAGS="`echo " %{optflags} " | sed 's/ -m\(64\|3[21]\) / /g;s/ -fexceptions / /g;s/^ //;s/ $//' | \
     sed s/-Wp,-D_FORTIFY_SOURCE=2// | sed s/-D_FORTIFY_SOURCE=2//`"
 
-export CFLAGS="$RPM_OPT_FLAGS"
-export CXXFLAGS="$RPM_OPT_FLAGS"
+export CFLAGS="$RPM_OPT_FLAGS -DVSCREENINFO_BORKAGE"
+export CXXFLAGS="$RPM_OPT_FLAGS -DVSCREENINFO_BORKAGE"
 autoreconf -fi
 export GDB=/usr/bin/gdb
 
-%configure CFLAGS="$RPM_OPT_FLAGS" CXXFLAGS="$RPM_OPT_FLAGS"
+%configure CFLAGS="$CFLAGS" CXXFLAGS="$CXXFLAGS"
 make %{_smp_mflags}
 
 %install
