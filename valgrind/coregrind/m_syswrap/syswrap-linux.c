@@ -6191,10 +6191,22 @@ PRE(sys_ioctl)
    case VKI_FBIOGET_VSCREENINFO: /* 0x4600 */
       PRE_MEM_WRITE( "ioctl(FBIOGET_VSCREENINFO)", ARG3,
                      sizeof(struct vki_fb_var_screeninfo));
+#ifdef VSCREENINFO_BORKAGE
+      /* Some kernels have a fb_var_screeninfo that's 4 bytes too large.
+         There's no way to detect this because the ioctl number has no
+         size info in it. */
+      PRE_MEM_WRITE( "ioctl(FBIOGET_VSCREENINFO) borkage",
+                     (Addr) ARG3 + sizeof(struct vki_fb_var_screeninfo), 4);
+#endif
       break;
    case VKI_FBIOPUT_VSCREENINFO:
       PRE_MEM_READ( "ioctl(FBIOPUT_VSCREENINFO)", ARG3,
                     sizeof(struct vki_fb_var_screeninfo));
+#ifdef VSCREENINFO_BORKAGE
+      PRE_MEM_WRITE( "ioctl(FBIOGET_VSCREENINFO) borkage",
+                     (Addr) ARG3 + sizeof(struct vki_fb_var_screeninfo), 4);
+#endif
+      break;
       break;
    case VKI_FBIOGET_FSCREENINFO: /* 0x4602 */
       PRE_MEM_WRITE( "ioctl(FBIOGET_FSCREENINFO)", ARG3,
@@ -7492,6 +7504,13 @@ POST(sys_ioctl)
 
    case VKI_FBIOGET_VSCREENINFO: //0x4600
       POST_MEM_WRITE(ARG3, sizeof(struct vki_fb_var_screeninfo));
+#ifdef VSCREENINFO_BORKAGE
+      /* Some kernels have a fb_var_screeninfo that's 4 bytes too large.
+         There's no way to detect this because the ioctl number has no
+         size info in it. */
+      POST_MEM_WRITE((Addr) ARG3 + sizeof(struct vki_fb_var_screeninfo), 4);
+#endif
+      break;
       break;
    case VKI_FBIOGET_FSCREENINFO: //0x4602
       POST_MEM_WRITE(ARG3, sizeof(struct vki_fb_fix_screeninfo));
